@@ -3,6 +3,30 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+from sklearn.decomposition import PCA
+
+
+def make_pca_grid(gene_selection_funcs, normalized_counts):
+    pca = PCA(n_components=50)
+    return [
+        [
+            pca.fit_transform(counts.loc[:, selection_func(counts)])
+            for counts in normalized_counts
+        ]
+        for selection_func in gene_selection_funcs
+    ]
+
+
+def compute_fano_factor(counts):
+    mean_counts = counts.mean(axis=0)
+
+    # Compute the variance of the expression counts of each gene
+    var_counts = counts.var(axis=0)
+
+    # Fano factor
+    fano = var_counts / mean_counts
+    return fano
+
 
 # Function taken from GitHub https://github.com/berenslab/mini-atlas/blob/master/code/
 def geneSelection(

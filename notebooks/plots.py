@@ -96,70 +96,39 @@ def plot_fano_factor(counts, ylim=None):
     axs[1].legend()
 
 
-def plot_CTF(
-    pca_CTF,
-    pca_log_CTF,
-    pca_sqrt_CTF,
-    pca_norm_counts,
-    pca_log2_norm_counts,
-    pca_sqrt_norm_counts,
-    cluster_colors,
-):
-    fig, axs = plt.subplots(2, 3, figsize=(9, 6))
-    axs = axs.flatten()
+def plot_PCA_row(data_row, titles, cluster_colors):
+    fig, axs = plt.subplots(1, len(data_row), figsize=(9, 3))
 
-    # Plot CTF
-
-    axs[0].scatter(pca_CTF[:, 0], pca_CTF[:, 1], s=3, c=cluster_colors, alpha=0.8)
-    axs[0].set_title("PCA")
-
-    axs[1].scatter(
-        pca_log_CTF[:, 0], pca_log_CTF[:, 1], s=3, c=cluster_colors, alpha=0.8
-    )
-    axs[1].set_title("PCA after $log_2(X+1)$")
-
-    axs[2].scatter(
-        pca_sqrt_CTF[:, 0], pca_sqrt_CTF[:, 1], s=3, c=cluster_colors, alpha=0.8
-    )
-    axs[2].set_title("PCA after sqrt")
-
-    axs[3].scatter(
-        pca_norm_counts[:, 0],
-        pca_norm_counts[:, 1],
-        s=3,
-        c=cluster_colors,
-        alpha=0.8,
-    )
-    axs[3].set_title("PCA")
-
-    axs[4].scatter(
-        pca_log2_norm_counts[:, 0],
-        pca_log2_norm_counts[:, 1],
-        s=3,
-        c=cluster_colors,
-        alpha=0.8,
-    )
-    axs[4].set_title("PCA after $log_2(X+1)$")
-    axs[4].set_xlim(-50, 100)
-    axs[4].set_ylim(-75, 75)
-
-    axs[5].scatter(
-        pca_sqrt_norm_counts[:, 0],
-        pca_sqrt_norm_counts[:, 1],
-        s=3,
-        c=cluster_colors,
-        alpha=0.8,
-    )
-    axs[5].set_title("PCA after sqrt")
-    axs[5].set_xlim(-300, 300)
-    axs[5].set_ylim(-200, 200)
+    for ax, data, title in zip(axs, data_row, titles):
+        ax.scatter(data[:, 0], data[:, 1], s=3, c=cluster_colors, alpha=0.8)
+        ax.set_title(title)
 
     fig.supxlabel("$1^{st}$ PC")
     fig.supylabel("$2^{nd}$ PC")
 
 
-def plot_TSNE(tsne_counts, cluster_colors):
-    fig, axs = plt.subplots()
-    axs.scatter(tsne_counts[:, 0], tsne_counts[:, 1], s=20, c=cluster_colors, alpha=0.8)
-    axs.set_title("TSNE")
-    axs.set_axis_off()
+def plot_PCA_grid(pca_grid, selection_titles, norm_titles, cluster_colors):
+    fig, axs = plt.subplots(
+        len(pca_grid),
+        len(pca_grid[0]),
+        figsize=(3 * len(pca_grid[0]), 3 * len(pca_grid)),
+    )
+
+    for ax_row, data_row, selection_title in zip(axs, pca_grid, selection_titles):
+        for ax, data, norm_title in zip(ax_row, data_row, norm_titles):
+            ax.scatter(data[:, 0], data[:, 1], s=3, c=cluster_colors, alpha=0.8)
+            ax.set_title(f"{norm_title} - {selection_title}")
+
+    fig.supxlabel("$1^{st}$ PC")
+    fig.supylabel("$2^{nd}$ PC")
+
+
+def plot_TSNE(tsne_counts, cluster_colors, lims=None, ax=None):
+    if ax is None:
+        _, ax = plt.subplots()
+    ax.scatter(tsne_counts[:, 0], tsne_counts[:, 1], s=20, c=cluster_colors, alpha=0.8)
+    ax.set_title("TSNE")
+    ax.set_axis_off()
+    if lims is not None:
+        ax.set_xlim(lims[0][0], lims[0][1])
+        ax.set_ylim(lims[1][0], lims[1][1])
